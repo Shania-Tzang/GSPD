@@ -1,35 +1,41 @@
-#include <SoftwareSerial.h>// import the serial library
+// Basic Bluetooth sketch HC-06_01
+// Connect the Hc-06 module and communicate using the serial monitor
+//
+// The HC-06 defaults to AT mode when first powered on.
+// The default baud rate is 9600
+// The Hc-06 requires all AT commands to be in uppercase. NL+CR should not be added to the command string
+//
  
-SoftwareSerial BT(0, 1); // RX, TX
-int ledpin=LED_BUILTIN; // led on D13 will show blink on / off
-int BluetoothData; // the data given from Computer
+ 
+//#include <SoftwareSerial.h>
+//SoftwareSerial BTserial(2, 3); // RX | TX
+// Connect the HC-06 TX to the Arduino RX on pin 2. 
+// Connect the HC-06 RX to the Arduino TX on pin 3 through a voltage divider.
+// 
+ 
  
 void setup() 
 {
-  // put your setup code here, to run once:
-  BT.begin(38400);
-  BT.println("Bluetooth On please press 1 or 0 blink LED ..");
-  pinMode(ledpin,OUTPUT);
+    Serial.begin(9600);
+    Serial.println("Enter AT commands:");
+ 
+    // HC-06 default serial speed is 9600
+    Serial1.begin(9600);  
 }
  
-void loop() 
+void loop()
 {
-  // put your main code here, to run repeatedly:
-  if (BT.available())
-  {
-    BluetoothData=BT.read();
-    if(BluetoothData=='1')
-    {   
-      // if number 1 pressed ....
-      digitalWrite(ledpin,1);
-      BT.println("LED  On D13 ON ! ");
+ 
+    // Keep reading from HC-06 and send to Arduino Serial Monitor
+    if (Serial1.available())
+    {  
+        Serial.write(Serial1.read());
     }
-    if (BluetoothData=='0')
+ 
+    // Keep reading from Arduino Serial Monitor and send to HC-06
+    if (Serial.available())
     {
-      // if number 0 pressed ....
-      digitalWrite(ledpin,0);
-      BT.println("LED  On D13 Off ! ");
+        Serial1.write(Serial.read());
     }
-  }
-delay(100);// prepare for next data ...
+ 
 }
