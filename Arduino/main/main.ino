@@ -21,7 +21,7 @@ float temp; //Stores temperature value
 void setup() {
   // Temperature/humidity
   Serial.begin(9600);
-  Serial.println("Enter AT commands:");
+  //Serial.println("Enter AT commands:");
   //dht.begin();
 
   // Light sensor  
@@ -43,40 +43,23 @@ void loop() {
   hum = dht.readHumidity();
   temp = dht.readTemperature();
 
-  /*Serial.println("\n=== TEMPERATURE / HUMIDITY ======");
-  Serial.print("Humidity: ");
-  Serial.print(hum);
-  Serial.println(" %");
-  Serial.print("Temperature: ");
-  Serial.print(temp);
-  Serial.println(" °C");*/
-
-
+  BTSerial.println("\n=== TEMPERATURE / HUMIDITY ======");
+  BTSerial.print("Humidity (%): ");
+  BTSerial.println(hum);
+  BTSerial.print("Temperature (°C): ");
+  BTSerial.println(temp);
 
   // Light sensor
-  /*Serial.println("=== LIGHT SENSOR ================");
-  Serial.print("Vis: "); 
-  Serial.println(uv.readVisible());
-  Serial.print("IR: "); 
-  Serial.println(uv.readIR());*/
+  BTSerial.println("=== LIGHT SENSOR ================");
+  BTSerial.print("Vis: "); 
+  BTSerial.println(uv.readVisible());
+  BTSerial.print("IR: "); 
+  BTSerial.println(uv.readIR());
 
-  float UVindex = uv.readUV();
+  // Does not output any data, not using this atm
+  /*float UVindex = uv.readUV();
   UVindex /= 100.0;  
+  BTSerial.print("UV: ");  Serial.println(UVindex);*/
   
-  //Serial.print("UV: ");  Serial.println(UVindex);
-
-
-
-  // Bluetooth
-  // Reading from HC-06 -> Send to Serial Monitor
-  if (BTSerial.available()) { 
-    Serial.write(BTSerial.read());
-  }
- 
-  // Reading from Serial Monitor -> Send to HC-06
-  if (Serial.available()) {
-    BTSerial.write(Serial.read());
-  }
-  
-  //delay(5000);
+  delay(4000);
 }
