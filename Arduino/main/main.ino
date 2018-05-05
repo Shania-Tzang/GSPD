@@ -25,7 +25,7 @@ void setup() {
   //dht.begin();
 
   // Light sensor  
-  if (! uv.begin()) {
+  if (!uv.begin()) {
     //Serial.println("Didn't find light sensor.");
     while (1);
   }
@@ -43,6 +43,7 @@ void loop() {
   hum = dht.readHumidity();
   temp = dht.readTemperature();
 
+  /*
   BTSerial.println("\n=== TEMPERATURE / HUMIDITY ======");
   BTSerial.print("Humidity (%): ");
   BTSerial.println(hum);
@@ -55,11 +56,33 @@ void loop() {
   BTSerial.println(uv.readVisible());
   BTSerial.print("IR: "); 
   BTSerial.println(uv.readIR());
+  */
+  BTSerial.print("Humidity (%): ");
+  BTSerial.print(hum);
+  BTSerial.print(" | Temperature (°C): ");
+  BTSerial.print(temp);
+  BTSerial.print(" | Vis: "); 
+  BTSerial.print(uv.readVisible());
+  BTSerial.print(" | IR: "); 
+  BTSerial.println(uv.readIR());
+
+  // Print the information also on the serial channel, to be sure.
+  Serial.println("\n=== TEMPERATURE / HUMIDITY ======");
+  Serial.print("Humidity (%): ");
+  Serial.println(hum);
+  Serial.print("Temperature (°C): ");
+  Serial.println(temp);
+  Serial.println("=== LIGHT SENSOR ================");
+  Serial.print("Vis: "); 
+  Serial.println(uv.readVisible());
+  Serial.print("IR: "); 
+  Serial.println(uv.readIR());
 
   // Does not output any data, not using this atm
   /*float UVindex = uv.readUV();
   UVindex /= 100.0;  
   BTSerial.print("UV: ");  Serial.println(UVindex);*/
-  
-  delay(4000);
+
+  int delay_seconds = 5;
+  delay(delay_seconds * 1000);
 }
