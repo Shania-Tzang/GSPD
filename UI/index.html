@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<title>HOME</title>
+
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+  <link rel="stylesheet" href="css/library.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/sidenev.js" defer></script>
+  <script src="js/switchtab.js" defer></script>
+</head>
+
+
+<body class="w3-light-grey">
+  <!-- Sidenav/menu -->
+  <nav class="w3-sidenav w3-black w3-animate-right w3-center w3-top   w3-text-light-grey w3-large" style="z-index:3;width:250px;font-weight:bold; display:none;right:0;"
+    id="mySidenav">
+    <a href="javascript:void()" onclick="w3_close()" class="w3-padding-32">CLOSE</a>
+    <a href="Developer.html" onclick="w3_close()" class="w3-padding-16">DEVELOPER</a>
+    <a href="Monitor.html" onclick="w3_close()" class="w3-padding-16">MONITOR</a>
+  </nav>
+
+  <!-- Top menu on small screens -->
+  <header class="w3-container w3-top w3-white w3-xlarge w3-padding-16">
+    <span class="w3-left w3-padding">HOME</span>
+    <a href="javascript:void(0)" class="w3-right w3-btn w3-white" onclick="w3_open()">☰</a>
+  </header>
+
+  <!-- Overlay effect when opening sidenav on small screens -->
+  <div class="w3-overlay w3-animate-opacity" onclick="w3_close()" style="cursor:pointer" title="close side menu" id="myOverlay"></div>
+
+  <!-- !PAGE CONTENT! -->
+  <div class="w3-main w3-content" style="max-width:1600px;margin-top:83px">
+
+    <!-- Tab links -->
+    <div class="tab">
+      <button class="tablinks active" onclick="opentab(event, 'Intro') ">Introduction</button>
+      </li>
+      <button class="tablinks" onclick="opentab(event, 'Relative')">Relative work</button>
+      <button class="tablinks" onclick="opentab(event, 'Method')">Method</button>
+      <button class="tablinks" onclick="opentab(event, 'Ref')">Reference</button>
+    </div>
+
+    <!-- Tab content -->
+    <div id="Intro" class="tabcontent" style="display: block;">
+      <h3>1. Introduction</h3>
+      <h4>1.1 Purpose of the system and Design Goals</h4>
+      <blockquote>
+        <p>The purpose of the system is an automated warehouse transport and store prototype using robotics and sensors.</p>
+
+        <h5>Robot requirements</h5>
+        <p>The Robot should be able to pick up a payload and deliver it to a storage location that satisfies the payload’s requirements.
+          Possible payload requirements are the following (supplied by Arduino and sensors): Temperature Light (IR & Visible)</p>
+
+        <h5>UI requirements</h5>
+        <p>A user should be able to monitor the warehouse, minimally through a terminal interface but preferable via a web GUI
+          with live video and sensor data</p>
+      </blockquote>
+      <h4>1.2 Definitions, acronyms and abbreviations</h4>
+    </div>
+
+    <div id="Relative" class="tabcontent">
+      <h3>2. Proposed software architecture</h3>
+      <h4>2.1 Overview</h4>
+      <blockquote>
+        <img src="pics/framework.png">
+      </blockquote>
+      <h4>2.2 Subsystem decomposition</h4>
+      <h5>2.2.1 Arduino</h5>
+      <p>The Arduino will handle continuous data gathering from light/temperature sensors and transmission of them via Bluetooth
+        to the main server.</p>
+      <h5>2.2.2 EV3</h5>
+      <p>The EV3 Robot will handle the physical requirements of transporting the payload by acting on the navigation instructions
+        sent by the server. </p>
+      <h5>2.2.3 Server and frontend</h5>
+      <p>The server will keep track of a virtual representation of the warehouse to guide the Robot to its destination according
+        to payload requirements and sensor data.</p>
+      The frontend will handle the interaction between end user and the system, providing video feedback of the warehouse.
+      <h4>2.3 Software/hardware mapping</h4>
+      <p>Describe how subsystems are assigned to hardware and off-the-shelf components. Also list and explain issues introduced
+        by multiple nodes and software re-use.</p>
+    </div>
+
+    <div id="Method" class="tabcontent">
+      <h3>3. Method</h3>
+      <h4>3.1 Time Line</h4>
+      <p></p>
+      <h4>3.2 Framework</h4>
+      <p></p>
+    </div>
+
+    <div id="Ref" class="tabcontent">
+      <h3> Subsystem architectures</h3>
+      <p>For each subsystem identified in section 3.2, give the (1) subsystem architecture: its design, either as a known pattern
+        or a new design; (2) the subsystem interface or API; and (3) a brief description of the implementation plan for the
+        subsystem</p>
+    </div>
+
+</body>
+
+</html>
