@@ -4,6 +4,8 @@ import time
 
 class EV3Robot:
 	__linePassed = 0			# no of line passed = no of grid passed
+	__currentPos = [1,1]
+	__desPos = []
 
 	# Init robot with sensors below, can change the port as needed
 	def __init__(self):
@@ -101,3 +103,9 @@ class EV3Robot:
 
 	def setLinePassed(self, no):
 		self.__linePassed = no
+
+	def setDesPos(self, des):
+		self.__desPos = des
+
+	def calculateDaWay(self):
+		
