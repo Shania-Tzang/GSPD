@@ -3,18 +3,16 @@ import ev3dev.ev3 as ev3
 import time
 
 class EV3Robot:
-	__state = 0					# state, if robot is passing a line
 	__linePassed = 0			# no of line passed = no of grid passed
 
 	# Init robot with sensors below, can change the port as needed
 	def __init__(self):
-		self.__self.__leftWheelWheel = ev3.LargeMotor('outB')
-		self.__self.__rightWheelWheel = ev3.LargeMotor('outD')
+		self.__leftWheel = ev3.LargeMotor('outB')
+		self.__rightWheel = ev3.LargeMotor('outD')
 		self.__gyro = ev3.GyroSensor('in2')			# measure the difference in angle when turning
 		self.__color = ev3.ColorSensor('in1')		
-		__color.mode = 'COL-COLOR'					# put color sensor in COL-COLOR mode that can
-													# only identify 7 types of color
-		__gyro.mode = 'GYRO-ANG'
+		self.__color.mode = 'COL-COLOR'					# put color sensor in COL-COLOR mode that can only detect 7 types of color
+		self.__gyro.mode = 'GYRO-ANG'
 
 	# Go straight for some milliseconds or forever. Speed is suggested to be 500rpm
 	def goStraight(self, speed = 500, millisecond = 0):
@@ -58,7 +56,7 @@ class EV3Robot:
 			self.__leftWheel.run_forever(speed_sp = -speed/2)
 			while True:
 				if(self.getRotateAngle() <= -88):	# This angle can be adjusted based on experiment
-					stop()
+					self.stop()
 					break
 				time.sleep(0.01)
 
@@ -74,7 +72,7 @@ class EV3Robot:
 			self.__rightWheel.run_forever(speed_sp=-speed/2)
 			while True:
 				if(self.getRotateAngle() >= 88):	# This angle can be adjusted based on experiment
-					stop()
+					self.stop()
 					break
 				time.sleep(0.01)
 
@@ -94,3 +92,12 @@ class EV3Robot:
 
 	def resetPassedLine(self):
 		self.__linePassed = 0
+
+	def getColor(self):
+		return self.__color.color
+
+	def getLinePassed(self):
+		return self.__linePassed
+
+	def setLinePassed(self, no):
+		self.__linePassed = no
