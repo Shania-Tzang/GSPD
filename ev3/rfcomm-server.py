@@ -35,10 +35,12 @@ try:
         data = client_sock.recv(1024)
         if len(data) == 0: break
         print("received [%s]" % data)
+
+        numberOflines = int(data)
 # Run motor on received message
-        m = ev3.LargeMotor('outD')
-        n = ev3.LargeMotor('outA')
-        m.run_timed(time_sp=100, speed_sp=-100)
+#        m = ev3.LargeMotor('outD')
+#        n = ev3.LargeMotor('outA')
+#        m.run_timed(time_sp=100, speed_sp=-100)
 except IOError:
     pass
 
