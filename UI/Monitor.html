@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
   <link rel="stylesheet" href="css/style.css">
   <script src="js/sidenev.js" defer></script>
+  <script src="js/switchtab.js" defer></script>
 </head>
 
 
@@ -18,7 +19,6 @@
     <a href="javascript:void()" onclick="w3_close()" class="w3-padding-32">CLOSE</a>
     <a href="index.html" onclick="w3_close()" class="w3-padding-16">HOME</a>
     <a href="Developer.html" onclick="w3_close()" class="w3-padding-16">DEVELOPER</a>
-
   </nav>
 
   <!-- Top menu on small screens -->
@@ -32,22 +32,49 @@
 
   <!-- !PAGE CONTENT! -->
   <div class="w3-main w3-content" style="max-width:1600px;margin-top:83px">
-    <div class="datashown">
 
-      <div class="plot-container">
-        Temperature
-        <br>
-        <embed class="plot" src="https://plot.ly/~ShaniaTzang/4.embed">
-      </div>
-
-      <div class="plot-container">
-        Lights
-        <br>
-        <embed class="plot" src="https://plot.ly/~ShaniaTzang/5.embed">
-      </div>
-
+    <!-- Tab links -->
+    <div class="tab">
+      <button class="tablinks active" onclick="opentab(event, 'D1')">Data1</button>
+      </li>
+      <button class="tablinks" onclick="opentab(event, 'D2')">Data2</button>
     </div>
-  </div>
+
+    <!-- Tab content -->
+
+    <div id="D1" class="tabcontent" style="display: block;">
+      <div class="datashown">
+
+        <div class="plot-container">
+          Temperature
+          <br>
+          <embed class="plot" src="https://plot.ly/~ShaniaTzang/4.embed">
+        </div>
+
+        <div class="plot-container">
+          Lights
+          <br>
+          <embed class="plot" src="https://plot.ly/~ShaniaTzang/5.embed">
+        </div>
+
+      </div>
+    </div>
+
+    <div id="D2" class="tabcontent">
+        <div class="datashown">
+
+            <div class="plot-container">
+              Temperature
+              <br>
+              <embed class="plot" src="https://plot.ly/~ShaniaTzang/4.embed">
+            </div>
+    
+            <div class="plot-container">
+              Lights
+              <br>
+              <embed class="plot" src="https://plot.ly/~ShaniaTzang/5.embed">
+            </div>
+    </div>
 
 </body>
 
