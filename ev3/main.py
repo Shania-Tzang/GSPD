@@ -9,6 +9,12 @@ if __name__ == "__main__":
 		r.setDesPos([4,3])
 		r.go()
 		r.goStraight(-500, 700)
+
+		## Main for new move and way calculation function (NOT YET TESTED)
+		# r.setCurPos([2,1])
+		# r.setDesPos([4,3])
+		# r.setOrientation([1,0])
+		# r.deliver()
 	except KeyboardInterrupt:
 		#print(e)
 		r.stop()

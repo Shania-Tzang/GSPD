@@ -7,6 +7,7 @@ class EV3Robot:
 	__linePassed = 0			# no of line passed = no of grid passed
 	__currentPos = [1,1]
 	__desPos = []
+	__orientation = [1,0]			# [1,0]: North, [0,1]: East, [-1,0]: South, [0,-1]: West
 
 	# Init robot with sensors below, can change the port as needed
 	def __init__(self):
@@ -60,6 +61,23 @@ class EV3Robot:
 			self.__rightWheel.run_forever(speed_sp=speed)
 			while True:
 				if(self.getRotateAngle() >= 85):	# This angle can be adjusted based on experiment
+					self.stop()
+					break
+				time.sleep(0.01)
+
+	def rotate180(self, speed = 500, millisecond = 0):
+		self.resetGyro()
+		if millisecond != 0:
+			#self.resetGyro()
+			self.__leftWheel.run_timed(time_sp = millisecond, speed_sp = -speed)	
+			self.__rightWheel.run_timed(time_sp = millisecond, speed_sp = speed)
+			#print(self.getRotateAngle())
+			time.sleep(millisecond/1000)
+		else:	
+			self.__leftWheel.run_forever(speed_sp=-speed)
+			self.__rightWheel.run_forever(speed_sp=speed)
+			while True:
+				if(self.getRotateAngle() >= 170):	# This angle can be adjusted based on experiment
 					self.stop()
 					break
 				time.sleep(0.01)
@@ -130,9 +148,17 @@ class EV3Robot:
 		self.__arm.run_timed(time_sp = millisecond, speed_sp = -speed)
 		time.sleep(millisecond/1000)
 
+	# Set current position
+	def setCurPos(self, cur):
+		self.__currentPos = cur
+
 	# Set destination
 	def setDesPos(self, des):
 		self.__desPos = des
+
+	# Set orientation
+	def setOrientation(self, orientation):
+		self.__orientation = orientation
 
 	# Check if robot has passed a black line == passed a grid
 	def passedBlackLine(self, state):
@@ -144,12 +170,16 @@ class EV3Robot:
 			state = 0
 		return state	
 
-	# Way calculation and moving function
+	# Way calculation and moving function. NOTE: ALREADY TESTED, BUT ONLY WORK IF ROBOT IS AT FIRST ROW, ORIENTED NORTH. NEW FUNCTION CAN BE FOUNDED AT LINE 285
 	def calculateDaWay(self):
-		if self.__desPos[1] - self.__currentPos[1]:
+		if self.__desPos[1] - self.__currentPos[1] >= 0:
 			# 2 strategies to go, choosen randomly
 			way1 = {"1":"straight-" + str(self.__desPos[0] - self.__currentPos[0]),"2":"right-" + str(self.__desPos[1] - self.__currentPos[1])}
 			way2 = {"2":"straight-" + str(self.__desPos[0] - self.__currentPos[0]),"1":"right-" + str(self.__desPos[1] - self.__currentPos[1])}
+		else:
+			# 2 strategies to go, choosen randomly
+			way1 = {"1":"straight-" + str(self.__desPos[0] - self.__currentPos[0]),"2":"left-" + str(abs(self.__desPos[1] - self.__currentPos[1]))}
+			way2 = {"2":"straight-" + str(self.__desPos[0] - self.__currentPos[0]),"1":"left-" + str(abs(self.__desPos[1] - self.__currentPos[1]))}
 		return [way1, way2]
 			
 	def go(self):
@@ -250,3 +280,59 @@ class EV3Robot:
 					self.setLinePassed(0)
 					break
 				time.sleep(0.01)
+
+
+	## New way to calculate road and move. NOTE: NOT YET TESTED, BUT IN THEORY CAN WORK IN ALL CASES: ROBOT POSITION RANDOMLY, ORIENTATION RANDOMLY
+
+	## Set a mid-destination point. Ex: currentPos: 1,1; desPos: 3,4 => temPos: 1,4 or 3,1
+	def setTempDesPoint(self):
+		point1 = [self.__desPos[0], self.__currentPos[1]]
+		point2 = [self.__currentPos[0], self.__desPos[1]]
+		if random.randint(1,2) == 1:
+			return point1
+		else:
+			return point2
+
+	## Solve the problem: Robot and tempDes on the same line (row or column), robot is oriented randomly, how can robot move to tempDes
+	def goSameLine(self, tempDes, finalDes = False):
+		if self.__currentPos[0] == tempDes[0] and self.__currentPos[1] == tempDes[1]: # If currentDes == tempDes
+			if finalDes == True:													  # Already finalDes => release cargo	
+				self.lowerArm()
+				self.goStraight(-500,500)
+				return
+			else:
+				return
+		newOrientation = [tempDes[0] - self.__currentPos[0], tempDes[1] - self.__currentPos[1]]	# direction vector from robot to tempDes
+		if self.__orientation[0] * newOrientation[0] + self.__orientation * newOrientation[1] != 0:
+			if self.__orientation[0] * newOrientation[0] > 0 or self.__orientation[1] * newOrientation[1] > 0:	# current orientation and direction vector have same direction
+				pass
+			else:	
+				self.rotate180()	# current orientation and direction vector have opposite direction
+		elif self.__orientation[0] * newOrientation[1] - self.__orientation[1] * newOrientation[0] > 0: # current orientation is to the left of direction vector
+			self.rotateRight()
+		else:	# current orientation is to the right of direction vector
+			self.rotateLeft()
+		self.__orientation = newOrientation	# update new orientation
+		state = 0
+		if newOrientation[0] != 0:			# calculate number of lines to pass
+			lines = abs(newOrientation[0])
+		else:
+			lines = abs(newOrientation[1])
+
+		self.goStraight()					# begin moving
+		while True:
+			state = self.passedBlackLine(state)
+			if self.getLinePassed() == lines:
+				self.stop()
+				self.setLinePassed(0)
+				if finalDes == True:		# if reaching destination then release cargo
+					self.lowerArm()
+					self.goStraight(-500,500)
+				else:
+					self.goStraight(500,700) # else move up a bit for robot to be at the center of the grid
+				break
+			time.sleep(0.01)
+
+	def deliver(self):
+		goSameLine(setTempDesPoint(), False)
+		goSameLine(self.__desPos, True)
