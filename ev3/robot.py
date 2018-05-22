@@ -8,7 +8,7 @@ class EV3Robot:
 	__currentPos = [1,1]
 	__desPos = []
 	__orientation = [1,0]			# [1,0]: North, [0,1]: East, [-1,0]: South, [0,-1]: West
-
+	__beginPos = [1,1]
 	# Init robot with sensors below, can change the port as needed
 	def __init__(self):
 		self.__leftWheel = ev3.LargeMotor('outB')
@@ -147,6 +147,10 @@ class EV3Robot:
 	def lowerArm(self, millisecond = 600, speed = 100):
 		self.__arm.run_timed(time_sp = millisecond, speed_sp = -speed)
 		time.sleep(millisecond/1000)
+
+	def setBeginPos(self, begin):
+		self.__beginPos = begin
+		self.setCurPos(begin)
 
 	# Set current position
 	def setCurPos(self, cur):
@@ -314,10 +318,13 @@ class EV3Robot:
 			self.rotateLeft()
 		self.__orientation = newOrientation	# update new orientation
 		state = 0
+		xory = 0	# hold temp value whether x value or y value of newOrientation is different from 0
 		if newOrientation[0] != 0:			# calculate number of lines to pass
 			lines = abs(newOrientation[0])
+			xory = 0
 		else:
 			lines = abs(newOrientation[1])
+			xory = 1
 
 		self.goStraight()					# begin moving
 		while True:
@@ -332,7 +339,19 @@ class EV3Robot:
 					self.goStraight(500,700) # else move up a bit for robot to be at the center of the grid
 				break
 			time.sleep(0.01)
+		# update current position
+		if finalDes == False:
+			self.__currentPos = tempDes
+		else:
+			if newOrientation[xory] > 0:
+				self.__currentPos[xory] = self.__currentPos[xory] + newOrientation[xory] - 1
+			else:
+				self.__currentPos[xory] = self.__currentPos[xory] + newOrientation[xory] + 1
 
 	def deliver(self):
 		goSameLine(setTempDesPoint(), False)
 		goSameLine(self.__desPos, True)
+		# Go back home
+		self.__desPos = self.__beginPos
+		goSameLine(setTempDesPoint(), False)
+		goSameLine(self.__desPos, False)
