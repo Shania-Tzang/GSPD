@@ -5,12 +5,18 @@ import serial
 channel = serial.Serial('/dev/tty.team1ARDUINO-DevB')
 
 # Based on: https://plot.ly/raspberry-pi/tmp36-temperature-tutorial/
-import plotly.plotly as py # plotly library
+# Plotly library
+import plotly.plotly as py
+import plotly.graph_objs as go
 import json # used to parse config.json
 import datetime # log and plot current time
 
+from os.path import abspath, dirname, join
+
+json_path = join(dirname(abspath(__file__)), 'config.json')
+
 # Parse the configuration
-with open('./config.json') as config_file:
+with open(json_path) as config_file:
     plotly_user_config = json.load(config_file)
 
 # Sign in to plotly
@@ -25,51 +31,24 @@ stream_id2 = plotly_user_config['plotly_streaming_tokens'][1]
 stream_id3 = plotly_user_config['plotly_streaming_tokens'][2]
 stream_id4 = plotly_user_config['plotly_streaming_tokens'][3]
 
+# Create the proper stream objects
+stream_config_1 = go.Stream(token=stream_id1, maxpoints=200)
+stream_config_2 = go.Stream(token=stream_id2, maxpoints=200)
+stream_config_3 = go.Stream(token=stream_id3, maxpoints=200)
+stream_config_4 = go.Stream(token=stream_id4, maxpoints=200)
+
+plot1 = go.Scatter(x = [], y = [], stream=stream_config_1, name='Humidity (%)')
+plot2 = go.Scatter(x = [], y = [], stream=stream_config_2, name='Temperature (°C)')
+plot3 = go.Scatter(x = [], y = [], stream=stream_config_3, name='VIS')
+plot4 = go.Scatter(x = [], y = [], stream=stream_config_4, name='IR')
+
 # Create a plot
-url1 = py.plot([
-        {
-            'x': [],
-            'y': [],
-            'type': 'scatter',
-            'name': 'Humidity (%)',
-            'stream': {
-                'token': stream_id1, 'maxpoints': 200
-            }
-        },
-        {
-            'x': [],
-            'y': [],
-            'type': 'scatter',
-            'name': 'Temperature (°C)',
-            'stream': {
-                'token': stream_id2, 'maxpoints': 200
-            }
-        }
-    ],
+url1 = py.plot([plot1, plot2],
     filename='Arduino Sensors data - Area conditions',
     fileopt='overwrite',
     auto_open=False)
 
-url2 = py.plot([
-        {
-            'x': [],
-            'y': [],
-            'type': 'scatter',
-            'name': 'VIS',
-            'stream': {
-                'token': stream_id3, 'maxpoints': 200
-            }
-        },
-        {
-            'x': [],
-            'y': [],
-            'type': 'scatter',
-            'name': 'IR',
-            'stream': {
-                'token': stream_id4, 'maxpoints': 200
-            }
-        }
-    ],
+url2 = py.plot([plot3, plot4],
     filename='Arduino Sensors data - Light conditions',
     fileopt='overwrite',
     auto_open=False)
@@ -87,42 +66,46 @@ stream4 = py.Stream(stream_id4)
 stream4.open()
 
 # Fetch the data
-while True:
-    #print(ser.readline())
-    # Read one line, decode it from bytes and strip spaces at left and right
-    data = channel.readline().decode().strip()
-    
-    # Check everything works
-    print(data)
+try:
+    while True:
+        #print(ser.readline())
+        # Read one line, decode it from bytes and strip spaces at left and right
+        data = channel.readline().decode().strip()
 
-    # Split the data, given the separator
-    data = data.split('|')
-    # Read the data properly
-    reworked_data = []
-    for sensor in data:
-        description, value = sensor.split(':')
-        value = float(value)
-        reworked_data.append((description, value))
-    #print(reworked_data)
+        # Check everything works
+        print(data, end='\r')
 
-    # write the data to plotly
-    stream1.write(
-        {
-            'x': datetime.datetime.now(),
-            'y': reworked_data[0][1]
-        })
-    stream2.write(
-        {
-            'x': datetime.datetime.now(),
-            'y': reworked_data[1][1]
-        })
-    stream3.write(
-        {
-            'x': datetime.datetime.now(),
-            'y': reworked_data[2][1]
-        })
-    stream4.write(
-        {
-            'x': datetime.datetime.now(),
-            'y': reworked_data[3][1]
-        })
+        # Split the data, given the separator
+        data = data.split('|')
+        # Read the data properly
+        reworked_data = []
+        for sensor in data:
+            description, value = sensor.split(':')
+            value = float(value)
+            reworked_data.append((description, value))
+        #print(reworked_data)
+
+        # write the data to plotly
+        stream1.write(
+            {
+                'x': datetime.datetime.now(),
+                'y': reworked_data[0][1]
+            })
+        stream2.write(
+            {
+                'x': datetime.datetime.now(),
+                'y': reworked_data[1][1]
+            })
+        stream3.write(
+            {
+                'x': datetime.datetime.now(),
+                'y': reworked_data[2][1]
+            })
+        stream4.write(
+            {
+                'x': datetime.datetime.now(),
+                'y': reworked_data[3][1]
+            })
+        # 
+except KeyboardInterrupt:
+    print('\nClosing')
