@@ -4,7 +4,7 @@ import serial
 arduino_ser = serial.Serial('/dev/tty.team1ARDUINO-DevB')
 
 # Establish serial connection to the EV3
-ev3_ser = serial.Serial('/dev/tty.ev3dev')
+#ev3_ser = serial.Serial('/dev/tty.ev3dev')
 
 # Coords #########################
 arduino_pos = (3, 3)
@@ -53,7 +53,7 @@ def req_are_fulfilled(values, humidity_req, temperature_req, vis_req, ir_req):
     if (temperature >= temperature_req[0] and temperature <= temperature_req[1]) or (temperature_req[0] == 0.0 and temperature_req[1] == 0.0):
         no_of_reqs_fulfilled += 1
         print("temperature OK")
-    if (vis >= humidity_req[0] and vis <= humidity_req[1]) or (humidity_req[0] == 0.0 and humidity_req[1] == 0.0):
+    if (vis >= vis_req[0] and vis <= vis_req[1]) or (vis_req[0] == 0.0 and vis_req[1] == 0.0):
         no_of_reqs_fulfilled += 1
         print("vis OK")
     if (ir >= ir_req[0] and ir <= ir_req[1]) or (ir_req[0] == 0.0 and ir_req[1] == 0.0):
@@ -146,12 +146,12 @@ def run_menu():
         print("Moving package to storage destination.")
         translated_path = translate_path(arduino_pos)
         print(translated_path)
-        ev3_ser.write(translated_path)
+#ev3_ser.write(translated_path)
     else:
         print("Requirements not fulfilled.")
         print("Moving package to another destination.")
         translated_path = translate_path(alt_pos)
         print(translated_path)
-        ev3_ser.write(translated_path)
+#ev3_ser.write(translated_path)
 
 run_menu()
