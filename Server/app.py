@@ -4,7 +4,7 @@ import serial
 arduino_ser = serial.Serial('/dev/tty.team1ARDUINO-DevB')
 
 # Establish serial connection to the EV3
-#ev3_ser = serial.Serial('/dev/tty.ev3dev')
+ev3_ser = serial.Serial('/dev/tty.ev3dev')
 
 # Coords #########################
 arduino_pos = (3, 3)
@@ -146,12 +146,12 @@ def run_menu():
         print("Moving package to storage destination.")
         translated_path = translate_path(arduino_pos)
         print(translated_path)
-#ev3_ser.write(translated_path)
+        ev3_ser.write(translated_path)
     else:
         print("Requirements not fulfilled.")
         print("Moving package to another destination.")
         translated_path = translate_path(alt_pos)
         print(translated_path)
-#ev3_ser.write(translated_path)
+        ev3_ser.write(translated_path)
 
 run_menu()
