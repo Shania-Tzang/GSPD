@@ -23,7 +23,7 @@
 
   <!-- Top menu on small screens -->
   <header class="w3-container w3-top w3-white w3-xlarge w3-padding-16">
-    <span class="w3-left w3-padding">MONITOR</span>
+    <span class="w3-left w3-padding">MONITOR2</span>
     <a href="javascript:void(0)" class="w3-right w3-btn w3-white" onclick="w3_open()">☰</a>
   </header>
 
@@ -37,7 +37,6 @@
       <button class="tablinks active" onclick="opentab(event, 'D1')">Data1</button>
       </li>
       <button class="tablinks" onclick="opentab(event, 'D2')">Data2</button>
-      <button class="tablinks" onclick="opentab(event, 'VDO')">Vedio</button>
     </div>
     <!-- Tab content -->
     <div id="D1" class="tabcontent" style="display: block;">
@@ -54,9 +53,10 @@
           <br>
           <embed class="plot" src="https://plot.ly/~ShaniaTzang/5.embed">
         </div>
+
       </div>
     </div>
-
+    
     <div id="D2" class="tabcontent">
       <div class="datashown">
 
@@ -74,29 +74,13 @@
       </div>
     </div>
 
-    <div id="VDO" class="tabcontent">
-      <div class="datashown">
-        <div class="vedio-container">
-            Video Streaming Demonstration
-            <br>
-            <br>
-            <br>
-            <br>
-            <img width="650px" src="http://localhost:5000/video_feed">
-            <!-- <img width="650px" src="https://video-stream.localtunnel.me"> -->
-        </div>
-      </div>
+    <!--Grid present-->
+    <div class="grid">
+        <br>
+        Robot Position:
+        <br>
+        <embed class="plot" src="https://plot.ly/~ShaniaTzang/17.embed">
     </div>
-
-  </div>
-
-
-  <!--Grid present-->
-  <div class="RobotPos">
-    Robot Position
-    <br>
-    <br>
-    <embed class="grid" src="https://plot.ly/~ShaniaTzang/17.embed">
   </div>
 
 </body>

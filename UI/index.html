@@ -64,37 +64,63 @@
       <h3>2. Proposed software architecture</h3>
       <h4>2.1 Overview</h4>
       <blockquote>
-        <img src="pics/framework.png">
+        <img width="51%" src="pics/goal.png">
       </blockquote>
       <h4>2.2 Subsystem decomposition</h4>
-      <h5>2.2.1 Arduino</h5>
-      <p>The Arduino will handle continuous data gathering from light/temperature sensors and transmission of them via Bluetooth
-        to the main server.</p>
-      <h5>2.2.2 EV3</h5>
-      <p>The EV3 Robot will handle the physical requirements of transporting the payload by acting on the navigation instructions
-        sent by the server. </p>
-      <h5>2.2.3 Server and frontend</h5>
-      <p>The server will keep track of a virtual representation of the warehouse to guide the Robot to its destination according
-        to payload requirements and sensor data.</p>
-      The frontend will handle the interaction between end user and the system, providing video feedback of the warehouse.
+      <blockquote>
+        <h5>2.2.1 Arduino</h5>
+        <p>The Arduino will handle continuous data gathering from light/temperature sensors and transmission of them via Bluetooth
+          to the main server.</p>
+        <h5>2.2.2 EV3</h5>
+        <p>The EV3 Robot will handle the physical requirements of transporting the payload by acting on the navigation instructions
+          sent by the server. </p>
+        <h5>2.2.3 Server and frontend</h5>
+        <p>The server will keep track of a virtual representation of the warehouse to guide the Robot to its destination according
+          to payload requirements and sensor data.</p>
+        The frontend will handle the interaction between end user and the system, providing video feedback of the warehouse.
+      </blockquote>
       <h4>2.3 Software/hardware mapping</h4>
-      <p>Describe how subsystems are assigned to hardware and off-the-shelf components. Also list and explain issues introduced
-        by multiple nodes and software re-use.</p>
+      <blockquote>
+        <p>Describe how subsystems are assigned to hardware and off-the-shelf components. Also list and explain issues introduced
+          by multiple nodes and software re-use.</p>
+      </blockquote>
     </div>
 
     <div id="Method" class="tabcontent">
       <h3>3. Method</h3>
-      <h4>3.1 Time Line</h4>
-      <p></p>
-      <h4>3.2 Framework</h4>
-      <p></p>
+      <blockquote>
+        <img width="70%" src="pics/overall.png">
+      </blockquote>
+      <h4>3.1 Sensor data</h4>
+      <blockquote>
+        <h5> Check The requirements of a package</h5>
+        Minimum required visible light (vis)
+        <h5> Checking values</h5>
+        If vis > ?? then the light in a storage facility in our warehouse is considered to be bright, else dark
+        <h5> Deciding target corrdinates</h5>
+        Based on the requirements and current sensor values.
+
+      </blockquote>
+      <h4>3.2 Client & Server</h4>
+      <blockquote>
+        <h5>Sever & Client features</h5>
+        Present the sensor values & EV3 position in real time
+using Plotly.<br>
+Host a video livestream of the warehouse.<br>
+Interpret sensor data & translate it to navigation instructions for EV3.
+      </blockquote>
+      <h4>3.3 Lego EV3</h4>
+      <blockquote>
+        <img width="50%" src="pics/grid.png">
+      </blockquote>
     </div>
 
     <div id="Ref" class="tabcontent">
       <h3> Subsystem architectures</h3>
       <p>For each subsystem identified in section 3.2, give the (1) subsystem architecture: its design, either as a known pattern
         or a new design; (2) the subsystem interface or API; and (3) a brief description of the implementation plan for the
-        subsystem</p>
+        subsystem
+      </p>
     </div>
 
 </body>
