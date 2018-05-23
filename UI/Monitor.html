@@ -37,6 +37,7 @@
       <button class="tablinks active" onclick="opentab(event, 'D1')">Data1</button>
       </li>
       <button class="tablinks" onclick="opentab(event, 'D2')">Data2</button>
+      <button class="tablinks" onclick="opentab(event, 'VDO')">Vedio</button>
     </div>
     <!-- Tab content -->
     <div id="D1" class="tabcontent" style="display: block;">
@@ -53,10 +54,9 @@
           <br>
           <embed class="plot" src="https://plot.ly/~ShaniaTzang/5.embed">
         </div>
-
       </div>
     </div>
-    
+
     <div id="D2" class="tabcontent">
       <div class="datashown">
 
@@ -73,14 +73,24 @@
         </div>
       </div>
     </div>
+    <div id="VDO" class="tabcontent">
+      <div class="datashown">
 
-    <!--Grid present-->
-    <div class="grid">
-        <br>
-        Robot Position:
-        <br>
-        <embed class="plot" src="https://plot.ly/~ShaniaTzang/17.embed">
+        <div class="vedio-container">
+         Vedio Stream
+          <br>
+        </div>
+      </div>
     </div>
+
+  </div>
+
+
+  <!--Grid present-->
+  <div class="RobotPos">
+    Robot Position
+    <br>
+    <embed class="grid" src="https://plot.ly/~ShaniaTzang/17.embed">
   </div>
 
 </body>
