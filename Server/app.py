@@ -26,12 +26,7 @@ def is_number(n):
     return True
 
 def translate_path((x, y)):
-    new_x = x-1
-    new_x_string = str(new_x)
-    new_y = y-1
-    new_y_string = str(new_y)
-    translated_path = new_y_string + new_x_string
-    return translated_path
+    return str(y) + str(x)
 
 def req_are_fulfilled(values, humidity_req, temperature_req, vis_req, ir_req):
     no_of_reqs_fulfilled = 0
@@ -41,14 +36,29 @@ def req_are_fulfilled(values, humidity_req, temperature_req, vis_req, ir_req):
     vis = values[2]
     ir = values[3]
     
+    print("CHECK: VALUES")
+    print(humidity)
+    print(temperature)
+    print(vis)
+    print(ir)
+    print("CHECK: REQ VALUES")
+    print(humidity_req)
+    print(temperature_req)
+    print(vis_req)
+    print(ir_req)
+    
     if (humidity >= humidity_req[0] and humidity <= humidity_req[1]) or (humidity_req[0] == 0.0 and humidity_req[1] == 0.0):
         no_of_reqs_fulfilled += 1
+        print("humidity OK")
     if (temperature >= temperature_req[0] and temperature <= temperature_req[1]) or (temperature_req[0] == 0.0 and temperature_req[1] == 0.0):
         no_of_reqs_fulfilled += 1
+        print("temperature OK")
     if (vis >= humidity_req[0] and vis <= humidity_req[1]) or (humidity_req[0] == 0.0 and humidity_req[1] == 0.0):
         no_of_reqs_fulfilled += 1
+        print("vis OK")
     if (ir >= ir_req[0] and ir <= ir_req[1]) or (ir_req[0] == 0.0 and ir_req[1] == 0.0):
         no_of_reqs_fulfilled += 1
+        print("ir OK")
     if (no_of_reqs_fulfilled == 4):
         return True
     else:
@@ -81,6 +91,7 @@ def read_sensor_values():
     return values
 
 def run_menu():
+    
     humidity_req = [0.0, 0.0]
     temperature_req = [0.0, 0.0]
     vis_req = [0.0, 0.0]
@@ -134,11 +145,13 @@ def run_menu():
         print("All requirements fulfilled!")
         print("Moving package to storage destination.")
         translated_path = translate_path(arduino_pos)
+        print(translated_path)
         ev3_ser.write(translated_path)
     else:
         print("Requirements not fulfilled.")
         print("Moving package to another destination.")
         translated_path = translate_path(alt_pos)
+        print(translated_path)
         ev3_ser.write(translated_path)
 
 run_menu()
