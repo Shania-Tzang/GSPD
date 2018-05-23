@@ -5,10 +5,10 @@ import random
 
 class EV3Robot:
 	__linePassed = 0			# no of line passed = no of grid passed
-	__currentPos = [1,1]
+	__currentPos = []
 	__desPos = []
-	__orientation = [1,0]			# [1,0]: North, [0,1]: East, [-1,0]: South, [0,-1]: West
-	__beginPos = [1,1]
+	__orientation = []			# [1,0]: North, [0,1]: East, [-1,0]: South, [0,-1]: West
+	__beginPos = []
 	# Init robot with sensors below, can change the port as needed
 	def __init__(self):
 		self.__leftWheel = ev3.LargeMotor('outB')
@@ -20,17 +20,37 @@ class EV3Robot:
 		self.__gyro.mode = 'GYRO-ANG'
 
 	# Go straight for some milliseconds or forever. Speed is suggested to be 500rpm
-	def goStraight(self, speed = 500, millisecond = 0):
+	def goStraight(self, speed = 200, millisecond = 0):
 		if millisecond != 0:
-			self.__leftWheel.run_timed(time_sp=millisecond, speed_sp=-speed)
-			self.__rightWheel.run_timed(time_sp=millisecond, speed_sp=-speed)
+			self.__leftWheel.run_timed(time_sp=millisecond, speed_sp=speed)
+			self.__rightWheel.run_timed(time_sp=millisecond, speed_sp=speed)
+			time.sleep(millisecond/1000)
+		else:	
+			self.__leftWheel.run_forever(speed_sp=speed)
+			self.__rightWheel.run_forever(speed_sp=speed)
+
+	# Spin around at its standpoint to the left, timed or forever
+	def rotateLeft(self, speed = 200, millisecond = 0):
+		self.resetGyro()
+		if millisecond != 0:
+			#self.resetGyro()
+			self.__leftWheel.run_timed(time_sp = millisecond, speed_sp = -speed)	
+			self.__rightWheel.run_timed(time_sp = millisecond, speed_sp = speed)
+			#print(self.getRotateAngle())
 			time.sleep(millisecond/1000)
 		else:	
 			self.__leftWheel.run_forever(speed_sp=-speed)
-			self.__rightWheel.run_forever(speed_sp=-speed)
+			self.__rightWheel.run_forever(speed_sp=speed)
+			while True:
+				print(self.getRotateAngle())
+				if(abs(self.getRotateAngle()) >= 90):	# This angle can be adjusted based on experiment
+					self.stop()
+					break
+				time.sleep(0.01)
+		#self.resetGyro()
 
-	# Spin around at its standpoint to the left, timed or forever
-	def rotateLeft(self, speed = 500, millisecond = 0):
+	# Spin around at its standpoint to the right, timed or forever
+	def rotateRight(self, speed = 200, millisecond = 0):
 		self.resetGyro()
 		if millisecond != 0:
 			#self.resetGyro()
@@ -42,13 +62,14 @@ class EV3Robot:
 			self.__leftWheel.run_forever(speed_sp=speed)
 			self.__rightWheel.run_forever(speed_sp=-speed)
 			while True:
-				if(self.getRotateAngle() <= -85):	# This angle can be adjusted based on experiment
+				print(self.getRotateAngle())
+				if(self.getRotateAngle() >= 90):	# This angle can be adjusted based on experiment
 					self.stop()
 					break
 				time.sleep(0.01)
+		#self.resetGyro()
 
-	# Spin around at its standpoint to the right, timed or forever
-	def rotateRight(self, speed = 500, millisecond = 0):
+	def rotate180(self, speed = 200, millisecond = 0):
 		self.resetGyro()
 		if millisecond != 0:
 			#self.resetGyro()
@@ -60,30 +81,14 @@ class EV3Robot:
 			self.__leftWheel.run_forever(speed_sp=-speed)
 			self.__rightWheel.run_forever(speed_sp=speed)
 			while True:
-				if(self.getRotateAngle() >= 85):	# This angle can be adjusted based on experiment
+				if(abs(self.getRotateAngle()) >= 180):	# This angle can be adjusted based on experiment
 					self.stop()
 					break
 				time.sleep(0.01)
-
-	def rotate180(self, speed = 500, millisecond = 0):
 		self.resetGyro()
-		if millisecond != 0:
-			#self.resetGyro()
-			self.__leftWheel.run_timed(time_sp = millisecond, speed_sp = -speed)	
-			self.__rightWheel.run_timed(time_sp = millisecond, speed_sp = speed)
-			#print(self.getRotateAngle())
-			time.sleep(millisecond/1000)
-		else:	
-			self.__leftWheel.run_forever(speed_sp=-speed)
-			self.__rightWheel.run_forever(speed_sp=speed)
-			while True:
-				if(self.getRotateAngle() >= 170):	# This angle can be adjusted based on experiment
-					self.stop()
-					break
-				time.sleep(0.01)
 		
 	# Drift left until reaching 90 degree. Experiments show that drifting have the most accuracy for gyrosensor	
-	def turnLeft(self, speed = 500, millisecond = 0):
+	def turnLeft(self, speed = 200, millisecond = 0):
 		self.resetGyro()
 		if millisecond != 0:
 			self.__rightWheel.run_timed(time_sp = millisecond, speed_sp = -speed)
@@ -99,7 +104,7 @@ class EV3Robot:
 				time.sleep(0.01)
 
 	# Drift right until reaching 90 degree
-	def turnRight(self, speed = 500, millisecond = 0):
+	def turnRight(self, speed = 200, millisecond = 0):
 		self.resetGyro()
 		if millisecond != 0:
 			self.__leftWheel.run_timed(time_sp = millisecond, speed_sp = -speed)
@@ -140,9 +145,9 @@ class EV3Robot:
 		self.__linePassed = no
 
 	# Arm function
-	def raiseArm(self, time = 500, speed = 100):
-		self.__arm.run_timed(time_sp = time, speed_sp = speed)
-		time.sleep(time/1000)
+	def raiseArm(self, millisecond = 600, speed = 100):
+		self.__arm.run_timed(time_sp = millisecond, speed_sp = speed)
+		time.sleep(millisecond/1000)
 
 	def lowerArm(self, millisecond = 600, speed = 100):
 		self.__arm.run_timed(time_sp = millisecond, speed_sp = -speed)
@@ -174,119 +179,7 @@ class EV3Robot:
 			state = 0
 		return state	
 
-	# Way calculation and moving function. NOTE: ALREADY TESTED, BUT ONLY WORK IF ROBOT IS AT FIRST ROW, ORIENTED NORTH. NEW FUNCTION CAN BE FOUNDED AT LINE 285
-	def calculateDaWay(self):
-		if self.__desPos[1] - self.__currentPos[1] >= 0:
-			# 2 strategies to go, choosen randomly
-			way1 = {"1":"straight-" + str(self.__desPos[0] - self.__currentPos[0]),"2":"right-" + str(self.__desPos[1] - self.__currentPos[1])}
-			way2 = {"2":"straight-" + str(self.__desPos[0] - self.__currentPos[0]),"1":"right-" + str(self.__desPos[1] - self.__currentPos[1])}
-		else:
-			# 2 strategies to go, choosen randomly
-			way1 = {"1":"straight-" + str(self.__desPos[0] - self.__currentPos[0]),"2":"left-" + str(abs(self.__desPos[1] - self.__currentPos[1]))}
-			way2 = {"2":"straight-" + str(self.__desPos[0] - self.__currentPos[0]),"1":"left-" + str(abs(self.__desPos[1] - self.__currentPos[1]))}
-		return [way1, way2]
-			
-	def go(self):
-		if random.randint(1,2) == 1:		# Choose strategy
-			way = self.calculateDaWay()[0]
-		else:
-			way = self.calculateDaWay()[1]
-		state = 0
-		parseway1 = way["1"].split('-')
-		parseway2 = way["2"].split('-')
-		# First half of the way, go straight
-		if parseway1[0] == "straight":		# Straight first
-			if int(parseway1[1]) != 0:		# Check if destination is at the same row
-				self.goStraight()
-				while True:					# Count grid until reaching first position
-					state = self.passedBlackLine(state)
-					if self.getLinePassed() == int(parseway1[1]):
-						if int(parseway2[1] != 0): # If destination is not reached => move up a bit
-							time.sleep(0.7)
-						self.stop()
-						state = 0
-						self.setLinePassed(0)
-						break
-					time.sleep(0.01)
-			# Second half of the way, go left or right
-			if parseway2[0] == "right" and int(parseway2[1]) != 0: # Check if destination is at the same column
-				self.rotateRight()
-			elif parseway2[0] == "left" and int(parseway2[1]) != 0:
-				self.rotateLeft()
-			else:
-				self.lowerArm()	# If same column => at destination => drop cargo
-				return
-			self.goStraight()
-			while True:
-				state = self.passedBlackLine(state)
-				if self.getLinePassed() == int(parseway2[1]):
-					self.stop()
-					self.lowerArm()
-					state = 0
-					self.setLinePassed(0)
-					break
-				time.sleep(0.01)
-		# First half of the way, go left
-		elif parseway1[0] == "left":
-			if int(parseway1[1]) != 0:
-				self.rotateLeft()
-				self.goStraight()
-				while True:
-					state = self.passedBlackLine(state)
-					if self.getLinePassed() == int(parseway1[1]):
-						if int(parseway2[1] != 0): # If destination is not reached => move up a bit
-							time.sleep(0.7)
-						self.stop()
-						state = 0
-						self.setLinePassed(0)
-						break
-					time.sleep(0.01)
-			if int(parseway2[1]) == 0:
-				self.lowerArm()
-				return
-			self.rotateRight()
-			self.goStraight()
-			while True:
-				state = self.passedBlackLine(state)
-				if self.getLinePassed() == int(parseway2[1]):
-					self.stop()
-					self.lowerArm()
-					state = 0
-					self.setLinePassed(0)
-					break
-				time.sleep(0.01)
-		# First half of the way, go right
-		else:
-			if int(parseway1[1]) != 0:
-				self.rotateRight()
-				self.goStraight()
-				while True:
-					state = self.passedBlackLine(state)
-					if self.getLinePassed() == int(parseway1[1]):
-						if int(parseway2[1] != 0): # If destination is not reached => move up a bit
-							time.sleep(0.7)
-						self.stop()
-						state = 0
-						self.setLinePassed(0)
-						break
-					time.sleep(0.01)
-			if int(parseway2[1]) == 0:
-				self.lowerArm()
-				return
-			self.rotateLeft()
-			self.goStraight()
-			while True:
-				state = self.passedBlackLine(state)
-				if self.getLinePassed() == int(parseway2[1]):
-					self.stop()
-					self.lowerArm()
-					state = 0
-					self.setLinePassed(0)
-					break
-				time.sleep(0.01)
-
-
-	## New way to calculate road and move. NOTE: NOT YET TESTED, BUT IN THEORY CAN WORK IN ALL CASES: ROBOT POSITION RANDOMLY, ORIENTATION RANDOMLY
+	## New way to calculate road and move
 
 	## Set a mid-destination point. Ex: currentPos: 1,1; desPos: 3,4 => temPos: 1,4 or 3,1
 	def setTempDesPoint(self):
@@ -302,20 +195,24 @@ class EV3Robot:
 		if self.__currentPos[0] == tempDes[0] and self.__currentPos[1] == tempDes[1]: # If currentDes == tempDes
 			if finalDes == True:													  # Already finalDes => release cargo	
 				self.lowerArm()
-				self.goStraight(-500,500)
+				self.goStraight(-200,500)
+				self.raiseArm()
 				return
 			else:
 				return
 		newOrientation = [tempDes[0] - self.__currentPos[0], tempDes[1] - self.__currentPos[1]]	# direction vector from robot to tempDes
-		if self.__orientation[0] * newOrientation[0] + self.__orientation * newOrientation[1] != 0:
+		if self.__orientation[0] * newOrientation[0] + self.__orientation[1] * newOrientation[1] != 0:
 			if self.__orientation[0] * newOrientation[0] > 0 or self.__orientation[1] * newOrientation[1] > 0:	# current orientation and direction vector have same direction
 				pass
 			else:	
 				self.rotate180()	# current orientation and direction vector have opposite direction
+				#self.goStraight(-200,800)
 		elif self.__orientation[0] * newOrientation[1] - self.__orientation[1] * newOrientation[0] > 0: # current orientation is to the left of direction vector
 			self.rotateRight()
+			#self.goStraight(-200,500)
 		else:	# current orientation is to the right of direction vector
 			self.rotateLeft()
+			#self.goStraight(-200,800)
 		self.__orientation = newOrientation	# update new orientation
 		state = 0
 		xory = 0	# hold temp value whether x value or y value of newOrientation is different from 0
@@ -334,9 +231,10 @@ class EV3Robot:
 				self.setLinePassed(0)
 				if finalDes == True:		# if reaching destination then release cargo
 					self.lowerArm()
-					self.goStraight(-500,500)
+					self.goStraight(-200,500)
+					self.raiseArm()
 				else:
-					self.goStraight(500,700) # else move up a bit for robot to be at the center of the grid
+					self.goStraight(200,1200) # else move up a bit for robot to be at the center of the grid
 				break
 			time.sleep(0.01)
 		# update current position
@@ -349,9 +247,9 @@ class EV3Robot:
 				self.__currentPos[xory] = self.__currentPos[xory] + newOrientation[xory] + 1
 
 	def deliver(self):
-		goSameLine(setTempDesPoint(), False)
-		goSameLine(self.__desPos, True)
+		self.goSameLine(self.setTempDesPoint(), False)
+		self.goSameLine(self.__desPos, True)
 		# Go back home
 		self.__desPos = self.__beginPos
-		goSameLine(setTempDesPoint(), False)
-		goSameLine(self.__desPos, False)
+		self.goSameLine(self.setTempDesPoint(), False)
+		self.goSameLine(self.__desPos, False)
