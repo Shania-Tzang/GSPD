@@ -1,7 +1,7 @@
 import serial
 
 # Establish serial connection to the Arduino
-ser = serial.Serial('/dev/tty.team1ARDUINO-DevB')
+arduino_ser = serial.Serial('/dev/tty.team1ARDUINO-DevB')
 
 values = []
 
@@ -12,7 +12,7 @@ vis = 0.0
 ir = 0.0
 
 while True:
-    string = ser.readline()
+    string = arduino_ser.readline()
     
     for t in string.split():
         try:
@@ -20,8 +20,6 @@ while True:
         except ValueError:
             pass
     
-    print(values)
-
     humidity = values[0]
     temperature = values[1]
     vis = values[2]
