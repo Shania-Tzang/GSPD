@@ -38,7 +38,7 @@ stream_config_3 = go.Stream(token=stream_id3, maxpoints=200)
 stream_config_4 = go.Stream(token=stream_id4, maxpoints=200)
 
 plot1 = go.Scatter(x = [], y = [], stream=stream_config_1, name='Humidity (%)')
-plot2 = go.Scatter(x = [], y = [], stream=stream_config_2, name='Temperature (°C)')
+plot2 = go.Scatter(x = [], y = [], stream=stream_config_2, name='Temperature (C)')
 plot3 = go.Scatter(x = [], y = [], stream=stream_config_3, name='VIS')
 plot4 = go.Scatter(x = [], y = [], stream=stream_config_4, name='IR')
 
@@ -70,10 +70,10 @@ try:
     while True:
         #print(ser.readline())
         # Read one line, decode it from bytes and strip spaces at left and right
-        data = channel.readline().decode().strip()
+        data = channel.readline()#.decode().strip()
 
         # Check everything works
-        print(data, end='\r')
+        #print(data, end='\r')
 
         # Split the data, given the separator
         data = data.split('|')

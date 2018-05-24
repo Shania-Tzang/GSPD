@@ -1,10 +1,15 @@
 import serial
+import streamer_better as streamer
+import threading
+import time
+
+streamer = streamer.Streamer()
 
 # Establish serial connection to the Arduino
 arduino_ser = serial.Serial('/dev/tty.team1ARDUINO-DevB')
 
 # Establish serial connection to the EV3
-ev3_ser = serial.Serial('/dev/tty.ev3dev')
+#ev3_ser = serial.Serial('/dev/tty.ev3dev')
 
 # Coords #########################
 arduino_pos = (3, 3)
@@ -17,6 +22,21 @@ temperature = 0.0
 vis = 0.0
 ir = 0.0
 ##################################
+
+class StreamerThread(object):
+    
+    def __init__(self, interval=1):
+        self.interval = interval
+        
+        thread = threading.Thread(target=self.run, args=())
+        thread.daemon = False
+        thread.start()
+
+    def run(self):
+        #while True:
+            #print('\nRunning streamer.py...\n\n')
+            streamer.run()
+            time.sleep(self.interval)
 
 def is_number(n):
     try:
@@ -36,29 +56,14 @@ def req_are_fulfilled(values, humidity_req, temperature_req, vis_req, ir_req):
     vis = values[2]
     ir = values[3]
     
-    print("CHECK: VALUES")
-    print(humidity)
-    print(temperature)
-    print(vis)
-    print(ir)
-    print("CHECK: REQ VALUES")
-    print(humidity_req)
-    print(temperature_req)
-    print(vis_req)
-    print(ir_req)
-    
     if (humidity >= humidity_req[0] and humidity <= humidity_req[1]) or (humidity_req[0] == 0.0 and humidity_req[1] == 0.0):
         no_of_reqs_fulfilled += 1
-        print("humidity OK")
     if (temperature >= temperature_req[0] and temperature <= temperature_req[1]) or (temperature_req[0] == 0.0 and temperature_req[1] == 0.0):
         no_of_reqs_fulfilled += 1
-        print("temperature OK")
     if (vis >= vis_req[0] and vis <= vis_req[1]) or (vis_req[0] == 0.0 and vis_req[1] == 0.0):
         no_of_reqs_fulfilled += 1
-        print("vis OK")
     if (ir >= ir_req[0] and ir <= ir_req[1]) or (ir_req[0] == 0.0 and ir_req[1] == 0.0):
         no_of_reqs_fulfilled += 1
-        print("ir OK")
     if (no_of_reqs_fulfilled == 4):
         return True
     else:
@@ -67,6 +72,10 @@ def req_are_fulfilled(values, humidity_req, temperature_req, vis_req, ir_req):
 def read_sensor_values():
     print("Retrieving sensor data...\n")
     
+    while(streamer.is_waiting == False): time.sleep(0.1)
+
+    streamer.stream_is_busy = True
+
     values = []
     string = arduino_ser.readline()
     
@@ -87,6 +96,8 @@ def read_sensor_values():
     print("Vis:\t\t\t\t" + str(vis).strip('\n'))
     print("IR:\t\t\t\t" + str(ir).strip('\n'))
     print("================================================\n\n")
+
+    streamer.stream_is_busy = False
 
     return values
 
@@ -143,15 +154,20 @@ def run_menu():
 
     if req_are_fulfilled(values, humidity_req, temperature_req, vis_req, ir_req):
         print("All requirements fulfilled!")
-        print("Moving package to storage destination.")
+        print("Moving package to storage destination: " + str(arduino_pos) + "\n\n")
         translated_path = translate_path(arduino_pos)
+        #streamer.run()
         print(translated_path)
         ev3_ser.write(translated_path)
     else:
         print("Requirements not fulfilled.")
-        print("Moving package to another destination.")
+        print("Moving package to another destination. " + str(alt_pos) + "\n\n")
         translated_path = translate_path(alt_pos)
+        #streamer.run()
         print(translated_path)
         ev3_ser.write(translated_path)
 
-run_menu()
+streamer_thread = StreamerThread()
+
+while True:
+    run_menu()
