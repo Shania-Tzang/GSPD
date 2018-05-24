@@ -45,7 +45,7 @@ def is_number(n):
         return False
     return True
 
-def translate_path((x, y)):
+def translate_path(x, y):
     return str(y) + str(x)
 
 def req_are_fulfilled(values, humidity_req, temperature_req, vis_req, ir_req):
@@ -112,31 +112,31 @@ def run_menu():
     print("Please set the requirements for the package.\n")
     print("All inputs must be numbers and a valid range,")
     print("else (0.0, 0.0) will be set.\n\n")
-    min_hum = raw_input("Enter (1) Humidity requirement (min): ")
-    max_hum = raw_input("Enter (1) Humidity requirement (max): ")
+    min_hum = input("Enter (1) Humidity requirement (min): ")
+    max_hum = input("Enter (1) Humidity requirement (max): ")
 
     if (is_number(min_hum) and is_number(max_hum)):
         humidity_req = [float(min_hum), float(max_hum)]
     else:
         humidity_req = [0.0, 0.0]
-    min_temp = raw_input("\nEnter (2) Temperature requirement (min): ")
-    max_temp = raw_input("Enter (2) Temperature requirement (max): ")
+    min_temp = input("\nEnter (2) Temperature requirement (min): ")
+    max_temp = input("Enter (2) Temperature requirement (max): ")
     
     if (is_number(min_temp) and is_number(max_temp)):
         temperature_req = [float(min_temp), float(max_temp)]
     else:
         temperature_req = [0.0, 0.0]
 
-    min_vis = raw_input("\nEnter (3) Visible light requirement (min): ")
-    max_vis = raw_input("Enter (3) Visible light requirement (max): ")
+    min_vis = input("\nEnter (3) Visible light requirement (min): ")
+    max_vis = input("Enter (3) Visible light requirement (max): ")
 
     if (is_number(min_vis) and is_number(max_vis)):
         vis_req = [float(min_vis), float(max_vis)]
     else:
         vis_req = [0.0, 0.0]
 
-    min_ir = raw_input("\nEnter (4) IR requirement (min): ")
-    max_ir = raw_input("Enter (4) IR requirement (max): ")
+    min_ir = input("\nEnter (4) IR requirement (min): ")
+    max_ir = input("Enter (4) IR requirement (max): ")
 
     if (is_number(min_ir) and is_number(max_ir)):
         ir_req = [float(min_ir), float(max_ir)]
@@ -155,14 +155,14 @@ def run_menu():
     if req_are_fulfilled(values, humidity_req, temperature_req, vis_req, ir_req):
         print("All requirements fulfilled!")
         print("Moving package to storage destination: " + str(arduino_pos) + "\n\n")
-        translated_path = translate_path(arduino_pos)
+        translated_path = translate_path(arduino_pos[0], arduino_pos[1])
         #streamer.run()
         print(translated_path)
         ev3_ser.write(translated_path)
     else:
         print("Requirements not fulfilled.")
         print("Moving package to another destination. " + str(alt_pos) + "\n\n")
-        translated_path = translate_path(alt_pos)
+        translated_path = translate_path(alt_pos[0], alt_pos[1])
         #streamer.run()
         print(translated_path)
         ev3_ser.write(translated_path)

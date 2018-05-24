@@ -85,7 +85,7 @@ class Streamer:
 
                     self.is_waiting = False
 
-                    data = channel.readline()#.decode().strip()
+                    data = channel.readline().decode().strip()
 
                     # Check everything works
                     #print(data, end='\r')
