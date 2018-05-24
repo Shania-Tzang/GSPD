@@ -3,14 +3,17 @@ import ev3dev.ev3 as ev3
 import time
 import random
 
-class EV3Robot:
+class EV3Robot():
 	__linePassed = 0			# no of line passed = no of grid passed
 	__currentPos = []
 	__desPos = []
 	__orientation = []			# [1,0]: North, [0,1]: East, [-1,0]: South, [0,-1]: West
 	__beginPos = []
+	__path = [(1,1)]
+	__pathCursor = 0
+
 	# Init robot with sensors below, can change the port as needed
-	def __init__(self):
+	def __init__(self, socket):
 		self.__leftWheel = ev3.LargeMotor('outB')
 		self.__rightWheel = ev3.LargeMotor('outD')
 		self.__arm = ev3.MediumMotor('outC')
@@ -18,6 +21,7 @@ class EV3Robot:
 		self.__color = ev3.ColorSensor()		
 		self.__color.mode = 'COL-COLOR'					# put color sensor in COL-COLOR mode that can only detect 7 types of color
 		self.__gyro.mode = 'GYRO-ANG'
+		self.__socket = socket
 
 	# Go straight for some milliseconds or forever. Speed is suggested to be 500rpm
 	def goStraight(self, speed = 200, millisecond = 0):
@@ -31,6 +35,7 @@ class EV3Robot:
 
 	# Spin around at its standpoint to the left, timed or forever
 	def rotateLeft(self, speed = 200, millisecond = 0):
+		#self.transmit(self.__socket, "L")
 		self.resetGyro()
 		if millisecond != 0:
 			#self.resetGyro()
@@ -43,7 +48,7 @@ class EV3Robot:
 			self.__rightWheel.run_forever(speed_sp=speed)
 			while True:
 				print(self.getRotateAngle())
-				if(abs(self.getRotateAngle()) >= 90):	# This angle can be adjusted based on experiment
+				if(abs(self.getRotateAngle()) >= 84):	# This angle can be adjusted based on experiment
 					self.stop()
 					break
 				time.sleep(0.01)
@@ -51,6 +56,7 @@ class EV3Robot:
 
 	# Spin around at its standpoint to the right, timed or forever
 	def rotateRight(self, speed = 200, millisecond = 0):
+		#self.transmit(self.__socket, "R")
 		self.resetGyro()
 		if millisecond != 0:
 			#self.resetGyro()
@@ -63,13 +69,14 @@ class EV3Robot:
 			self.__rightWheel.run_forever(speed_sp=-speed)
 			while True:
 				print(self.getRotateAngle())
-				if(self.getRotateAngle() >= 90):	# This angle can be adjusted based on experiment
+				if(self.getRotateAngle() >= 84):	# This angle can be adjusted based on experiment
 					self.stop()
 					break
 				time.sleep(0.01)
 		#self.resetGyro()
 
-	def rotate180(self, speed = 200, millisecond = 0):
+	def rotate180(self, speed = 200, millisecond = 0, angle = 165):
+		#self.transmit(self.__socket, "180")
 		self.resetGyro()
 		if millisecond != 0:
 			#self.resetGyro()
@@ -81,7 +88,7 @@ class EV3Robot:
 			self.__leftWheel.run_forever(speed_sp=-speed)
 			self.__rightWheel.run_forever(speed_sp=speed)
 			while True:
-				if(abs(self.getRotateAngle()) >= 180):	# This angle can be adjusted based on experiment
+				if(abs(self.getRotateAngle()) >= angle):	# This angle can be adjusted based on experiment
 					self.stop()
 					break
 				time.sleep(0.01)
@@ -223,9 +230,17 @@ class EV3Robot:
 			lines = abs(newOrientation[1])
 			xory = 1
 
-		self.goStraight()					# begin moving
+		self.goStraight()
+		currentPassed = 0 # begin moving
 		while True:
+			print("path " + str(self.__path))
 			state = self.passedBlackLine(state)
+			if currentPassed != str(self.getLinePassed()) and self.__pathCursor < len(self.__path):
+				print ("debug lines passed" + str(self.getLinePassed()))
+				self.transmit(self.__socket, str(self.__path[self.__pathCursor][1]) + str(self.__path[self.__pathCursor][0]))
+				print (self.__path[self.__pathCursor])
+				self.incrementPathCursor()
+			currentPassed = str(self.getLinePassed())
 			if self.getLinePassed() == lines:
 				self.stop()
 				self.setLinePassed(0)
@@ -247,9 +262,109 @@ class EV3Robot:
 				self.__currentPos[xory] = self.__currentPos[xory] + newOrientation[xory] + 1
 
 	def deliver(self):
-		self.goSameLine(self.setTempDesPoint(), False)
+		midPoint =self.setTempDesPoint()
+		self.__path = calc_path([],[1,1],midPoint,self.__desPos)
+		self.goSameLine(midPoint, False)
 		self.goSameLine(self.__desPos, True)
 		# Go back home
+		prevDes = self.__desPos
 		self.__desPos = self.__beginPos
-		self.goSameLine(self.setTempDesPoint(), False)
+		tempNewBeginPos = self.__path[self.__pathCursor-2]
+		print(str(tempNewBeginPos))
+		midPoint2 = self.setTempDesPoint()
+		print("midpint: " +  str(midPoint2))
+		print("DEBUG " + str(self.__path[self.__pathCursor - 2]))
+		self.__path = calc_path_back([], self.__path[self.__pathCursor-2], midPoint2, self.__beginPos)
+		print(str(self.__path))
+		self.resetPathCursor()
+		self.goSameLine(midPoint2, False)
 		self.goSameLine(self.__desPos, False)
+		print("delivered")
+
+	def transmit(self, bltsocket, msg):
+		bltsocket.send(msg + "\n")
+
+	def resetPathCursor(self):
+		self.__pathCursor = 0
+
+	def incrementPathCursor(self):
+		self.__pathCursor = self.__pathCursor + 1
+
+def calc_path(path, startpoint, midpoint, destpoint):
+	print("stuck")
+	if (midpoint[0] == startpoint[0]):             # mY == sY => increment X
+		path.append([startpoint[0], startpoint[1]])
+		newpoint = [startpoint[0], startpoint[1]]
+		newpoint[1] += 1
+
+		while (newpoint[1] < midpoint[1]):
+			path.append([newpoint[0], newpoint[1]])
+			newpoint[1] += 1
+		path.append([midpoint[0], midpoint[1]])
+		newpoint2 = [midpoint[0], midpoint[1]]
+		newpoint2[0] += 1
+
+		while (newpoint2[0] < destpoint[0]):
+			path.append([newpoint2[0], newpoint2[1]])
+			newpoint2[0] += 1
+		path.append(destpoint)
+
+	else:                            # mY != sY => increment Y
+		path.append([startpoint[0], startpoint[1]])
+		newpoint = [startpoint[0], startpoint[1]]
+		newpoint[0] += 1
+
+		while (newpoint[0] < midpoint[0]):
+			path.append([newpoint[0], newpoint[1]])
+			newpoint[0] += 1
+		path.append([midpoint[0], midpoint[1]])
+		newpoint2 = [midpoint[0], midpoint[1]]
+		newpoint2[1] += 1
+
+		while (newpoint2[1] < destpoint[1]):
+			path.append([newpoint2[0], newpoint2[1]])
+			newpoint2[1] += 1
+		path.append([destpoint[0], destpoint[1]])
+
+	return path
+
+def calc_path_back(path, startpoint, midpoint, destpoint):
+	print ("in")
+	if (midpoint[0] == startpoint[0]):             # mY == sY => increment X
+		path.append([startpoint[0], startpoint[1]])
+		newpoint = [startpoint[0], startpoint[1]]
+		newpoint[1] -= 1
+
+		while (newpoint[1] > midpoint[1]):
+			path.append([newpoint[0], newpoint[1]])
+			newpoint[1] -= 1
+		path.append([midpoint[0], midpoint[1]])
+		newpoint2 = [midpoint[0], midpoint[1]]
+		newpoint2[0] -= 1
+
+		while (newpoint2[0] > destpoint[0]):
+			path.append([newpoint2[0], newpoint2[1]])
+			newpoint2[0] -= 1
+			print ("stuck")
+		path.append(destpoint)
+		print ("123")
+
+	else:                            # mY != sY => increment Y
+		path.append([startpoint[0], startpoint[1]])
+		newpoint = [startpoint[0], startpoint[1]]
+		newpoint[0] -= 1
+
+		while (newpoint[0] > midpoint[0]):
+			path.append([newpoint[0], newpoint[1]])
+			newpoint[0] -= 1
+		path.append([midpoint[0], midpoint[1]])
+		newpoint2 = [midpoint[0], midpoint[1]]
+		newpoint2[1] -= 1
+
+		while (newpoint2[1] > destpoint[1]):
+			path.append([newpoint2[0], newpoint2[1]])
+			newpoint2[1] -= 1
+		path.append([destpoint[0], destpoint[1]])
+
+	print ("done")
+	return path
